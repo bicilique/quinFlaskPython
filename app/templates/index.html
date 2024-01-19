@@ -1,18 +1,221 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<style>
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .pagination-container a {
+        color: #007BFF;
+        background-color: #fff;
+        border: 1px solid #007BFF;
+        padding: 8px 12px;
+        text-decoration: none;
+        margin: 0 5px;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .pagination-container a:hover {
+        background-color: #007BFF;
+        color: #fff;
+    }
+
+    .pagination-container .active a {
+        background-color: #007BFF;
+        color: #fff;
+    }
+</style>
+
+<section class="hero is-primary is-bold" style="max-height: 80px;">
+    <div class="hero-body"  style="max-height: 80px;padding: 1rem 1.1rem;background-color: #71baed;">
+        <div class="container">
+            <h1 class="title is-size-4">Bagaimana cuaca hari ini?</h1>
+        </div>
+    </div>
+</section>
+
+
+
+<section style="
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #71baed;
+">
+    <div class="container" style="
+        max-height: 80px;
+        ">
+        <div class="columns">
+            <div class="column is-offset-4 is-4">
+                <form method="POST">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input class="input is-small" name="city" type="text" placeholder="Nama Kota" style="text-transform: capitalize;">
+                        </div>
+                        <div class="control">
+                            <button class="button is-info is-small">
+                                Tambah Kota
+                            </button>
+                        </div>
+                    </div>
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            {% set message_class = 'is-success' %}
+
+                            {% if category == 'error' %}
+                                {% set message_class = 'is-danger' %}
+                            {% endif %}
+                            <div class="notification {{ message_class }} is-small" style="padding: 0.37">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    {% endwith %}
+                </form>
+
+                
+            </div>
+        </div>
+    </div>  
+</section>
+
+<section style="
+    padding-bottom: 10px;
+    background-color: #71baed;
+">
+    <div class="container">
+        <div class="columns is-multiline">
+            {% for weather in weather_data %}
+            <div class="column is-one-third">
+                <div class="box">
+                    <article class="media">
+                        <div class="media-left">
+                            <figure class="image is-32x32">
+                                <img src="http://openweathermap.org/img/w/{{ weather.icon }}.png" alt="Image">
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <div class="content">
+                                <p>
+                                    <span class="title is-size-6">{{ weather.city }}</span>
+                                    <br>
+                                    <span class="subtitle is-size-7">{{ weather.temperature }}° C</span>
+                                    <br> {{ weather.description }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="media-right">
+                           <a href="{{ url_for('delete_city', name=(weather.city)) }}"> 
+                               <button class="delete is-small"></button>
+                           </a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section style="
+    padding-bottom: 10px;
+    background-color: #71baed;
+">
+    <div class="container">
+        <div class="columns is-multiline">
+            <div class="column is-full">
+                <div style="overflow-x: auto; max-height: 250px;">
+                    <div id="weather-table-container">
+                        <table id="weather-table" class="table is-bordered is-narrow is-hoverable is-fullwidth" style=" font-size: small;">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Temp (°C)</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for weather in table_data %}
+                                <tr>
+                                    <td>{{ weather['Date'] }}</td>
+                                    <td>{{ weather['Time'] }}</td>
+                                    <td>{{ weather['Temperature'] }}</td>
+                                    <td>{{ weather['Description'] }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="pagination-container" class="pagination-container"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableContainer = document.getElementById('weather-table-container');
+        const table = document.getElementById('weather-table');
+        const tableHeader = table.querySelector('thead');
+        const rowsPerPage = 5;
+
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+
+            for (let i = 1; i < table.rows.length; i++) {
+                table.rows[i].style.display = i >= start && i < end ? 'table-row' : 'none';
+            }
+        }
+
+        function setupPagination() {
+            const totalPages = Math.ceil((table.rows.length - 1) / rowsPerPage); // Exclude header row
+
+            const paginationContainer = document.getElementById('pagination-container');
+            paginationContainer.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.href = '#';
+                pageLink.textContent = i;
+
+                pageLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    showPage(i);
+                });
+
+                paginationContainer.appendChild(pageLink);
+            }
+        }
+
+        showPage(1);
+        setupPagination();
+
+        // Fix header on scroll
+        tableHeader.style.position = 'sticky';
+        tableHeader.style.top = '0';
+    });
+</script>
     <div class="home-div">
         <img src="{{ url_for('static', filename='images/home.jpg') }}" class="home-img">
         <div class="info-div">
             {% if g.user %}
-                <h1>Welcome {{ g.user.username.capitalize() }}, </h1>
+                <h1>Selamat Datang {{ g.user.username.capitalize() }}, </h1>
             {% else %}
-                <h1>Sign In, Guest </h1>
+                <h1>Masuk, Pengunjung </h1>
             {% endif %}
-            <h4> Explore the Test Preparation 
-                exclusively made for you!
+            <h4> Quiz sudah disiapkan khusus untuk anda!
             </h4>
-            <a href="{{ url_for('question', id=1)}}">Take the test</a>
+            <a href="{{ url_for('question', id=1)}}">Mulai Quiz</a>
         </div>
     </div>
+
+
 {% endblock %}

@@ -14,17 +14,31 @@
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.css" />
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/mob-styles.css') }}">
+
+        <style>
+            .custom-section {
+                max-height: 80px;
+                overflow: hidden;
+            }
+    
+            /* Custom style for hero section */
+            .hero.custom-section .hero-body {
+                padding: 1rem; /* Adjust the padding as needed */
+            }
+        </style>
     </head>
     <body class="home-bg">
-    <nav>
+    <nav class="hero is-primary is-bold" style="max-height: 80px;">
         <ul class="nav-links">
-            <li> <a href="{{ url_for('home') }}"> Home </a> </li>
+            <li> <a href="{{ url_for('home') }}"> Beranda </a> </li>
             {% if not g.user %}
-            <li> <a href="{{ url_for('login') }}"> Login </a> </li>
+            <li> <a href="{{ url_for('login') }}"> Masuk </a> </li>
             {% else %}
-            <li> <a href="{{ url_for('logout') }}"> Logout </a> </li>
+            <li> <a href="{{ url_for('score') }}"> Score </a> </li>
+            <li> <a href="{{ url_for('logout') }}"> Keluar </a> </li>
             {% endif %}
         </ul>
     </nav>

@@ -1,10 +1,23 @@
 {% extends 'base.html' %}
 
 
+
 {% block content %}
+    <!-- Menampilkan skor pengguna -->  
+    <div class="score-main">
+        <div class="highest-score">
+            <div>Nilai tertinggi: {{ topUser.marks }} oleh </div> <div class="high-score-name">{{ topUser.username }}</div>
+        </div>
+        <h1 class="score-head">Your Score</h1>
+        <div class="score-circle">
+            <h1>{{ g.user.marks }}</h1>
+        </div>
+        <h1 class="congrats-cls">Semangat Mengerjakan Soal  <i class="fas fa-glass-cheers"></i></h1>
+    </div>
+
     <div class="ques-div">
         <form method="post" novalidate>
-            <h2 class="qnum">Question {{q.q_id}}</h2>
+            <h2 class="qnum">Pertanyaan</h2>
             <div class="dotted-spaced"></div>
             <hr>
             <h1 class="ques-heading">{{q.ques}}</h1>
@@ -13,9 +26,6 @@
             </div>
             {{ form.submit(class="btn btn-primary btn-lg sub-btn") }}
         </form>
-        <!-- <span class="check-circle">
-            <i class="fas fa-check-circle"></i>
-        </span> -->
     </div>
 
 {% endblock %}
